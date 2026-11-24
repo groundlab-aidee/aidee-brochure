@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aidee 브로슈어</title>
+<meta name="description" content="Aidee — A Multi-AI Agent Platform for Product Development. 브로슈어를 책처럼 넘겨보세요.">
+<link rel="preload" as="image" href="brochure/page-01.webp">
+<style>
+  :root { --bg:#020b1e; --accent:#d4e84a; --text:#e8ecf3; --muted:#8a94a8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; }
+  body {
+    background: radial-gradient(ellipse at 50% 40%, #0b1a3a 0%, var(--bg) 70%);
+    color:var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px; gap:12px; flex-shrink:0;
+  }
+  .back, .dl {
+    color:var(--text); text-decoration:none; font-size:14px;
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.18);
+    transition:background .2s, color .2s, border-color .2s;
+  }
+  .back:hover { background:rgba(255,255,255,.08); }
+  .dl { background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600; }
+  .dl:hover { filter:brightness(1.08); }
+  .title { font-size:14px; color:var(--muted); letter-spacing:.04em; }
+
+  main { flex:1; min-height:0; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:8px 16px 28px; position:relative; }
+  .stage { width:min(100%, calc((100dvh - 100px) * 1.414)); max-width:1300px; display:flex; align-items:center; justify-content:center; }
+  #book { width:100%; }
+  header { position:relative; z-index:20; }
+  #book { opacity:0; transition:opacity .4s, transform .6s cubic-bezier(.4,0,.2,1); }
+  #book.ready { opacity:1; }
+  .page { background:var(--bg); overflow:hidden; }
+  .page img { width:100%; height:100%; object-fit:cover; display:block; user-select:none; -webkit-user-drag:none; }
+
+  .loading { position:absolute; color:var(--muted); font-size:14px; }
+
+  .nav {
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:48px; height:48px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,.08); color:var(--text); font-size:22px;
+    display:flex; align-items:center; justify-content:center; transition:background .2s, opacity .2s; z-index:10;
+  }
+  .nav:hover { background:var(--accent); color:var(--bg); }
+  .nav:disabled { opacity:.25; pointer-events:none; }
+  .prev { left:16px; } .next { right:16px; }
+
+
+  @media (max-width: 640px) {
+    .stage { width:min(100%, calc((100dvh - 100px) * 0.707)); }
+    .nav { display:none; }
+    .title { display:none; }
+    header { padding:10px 12px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="https://aidee.imweb.me">← 홈으로</a>
+  <span class="title">AIDEE BROCHURE 2026</span>
+  <a class="dl" href="brochure/Aidee_Brochure_2026.pdf" download>PDF 다운로드</a>
+</header>
+
+<main>
+  <button class="nav prev" id="prev" aria-label="이전 페이지">‹</button>
+  <div class="stage">
+    <span class="loading" id="loading">브로슈어 불러오는 중…</span>
+    <div id="book">
+      <div class="page" data-density="hard"><img src="brochure/page-01.webp" alt="Aidee 브로슈어 표지 — Make Ideas Visible"></div>
+      <div class="page"><img src="brochure/page-02.webp" alt="브로슈어 2페이지" loading="lazy"></div>
+      <div class="page"><img src="brochure/page-03.webp" alt="브로슈어 3페이지" loading="lazy"></div>
+      <div class="page"><img src="brochure/page-04.webp" alt="브로슈어 4페이지" loading="lazy"></div>
+      <div class="page"><img src="brochure/page-05.webp" alt="브로슈어 5페이지" loading="lazy"></div>
+      <div class="page"><img src="brochure/page-06.webp" alt="브로슈어 6페이지" loading="lazy"></div>
+      <div class="page"><img src="brochure/page-07.webp" alt="브로슈어 7페이지" loading="lazy"></div>
+      <div class="page"><img src="brochure/page-08.webp" alt="브로슈어 8페이지" loading="lazy"></div>
+      <div class="page"><img src="brochure/page-09.webp" alt="브로슈어 9페이지" loading="lazy"></div>
+      <div class="page" data-density="hard"><img src="brochure/page-10.webp" alt="브로슈어 뒷표지" loading="lazy"></div>
+    </div>
+  </div>
+  <button class="nav next" id="next" aria-label="다음 페이지">›</button>
+</main>
+
+<script src="brochure/page-flip.browser.js"></script>
+<script>
+(function () {
+  var el = document.getElementById('book');
+  var pages = el.querySelectorAll('.page');
+  var total = pages.length;
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+
+  var book = new St.PageFlip(el, {
+    width: 600, height: 848,      // A4 비율 (1 : 1.414)
+    size: 'stretch',
+    minWidth: 260, maxWidth: 620,
+    minHeight: 368, maxHeight: 877,
+    showCover: true,               // 표지·뒷표지는 한 장, 안쪽은 양면 펼침
+    usePortrait: true,             // 좁은 화면에서는 한 페이지씩
+    maxShadowOpacity: 0.45,
+    mobileScrollSupport: false,
+    flippingTime: 800
+  });
+  book.loadFromHTML(pages);
+
+  function render() {
+    var i = book.getCurrentPageIndex();
+    prev.disabled = i === 0;
+    next.disabled = i >= total - (book.getOrientation() === 'landscape' && i > 0 ? 2 : 1);
+  }
+
+  // 표지·뒷표지처럼 한 페이지만 보일 때는 그 페이지를 가운데로 이동 (A5 한 장),
+  // 두 페이지가 펼쳐질 때는 원래 위치 (A4 가로)
+  function center(i) {
+    var shift = 0;
+    if (book.getOrientation() === 'landscape') {
+      if (i === 0) shift = -25;                                   // 표지: 오른쪽 → 가운데
+      else if (i === total - 1 && total % 2 === 0) shift = 25;   // 뒷표지: 왼쪽 → 가운데
+    }
+    el.style.transform = 'translateX(' + shift + '%)';
+  }
+  function update() { center(book.getCurrentPageIndex()); render(); }
+
+  book.on('flip', update);
+  book.on('changeOrientation', update);
+  book.on('init', function () {
+    el.classList.add('ready');
+    document.getElementById('loading').remove();
+    update();
+  });
+
+  function go(dir) {
+    var i = book.getCurrentPageIndex();
+    var landscape = book.getOrientation() === 'landscape';
+    var target = dir > 0 ? (landscape ? (i === 0 ? 1 : i + 2) : i + 1)
+                         : (landscape ? (i <= 2 ? 0 : i - 2) : i - 1);
+    target = Math.max(0, Math.min(total - 1, target));
+    center(target);
+    dir > 0 ? book.flipNext() : book.flipPrev();
+  }
+  prev.addEventListener('click', function () { go(-1); });
+  next.addEventListener('click', function () { go(1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') go(-1);
+    if (e.key === 'ArrowRight') go(1);
+  });
+})();
+</script>
+</body>
+</html>
