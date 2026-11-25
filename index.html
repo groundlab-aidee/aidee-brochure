@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Aidee 브로슈어</title>
-<meta name="description" content="Aidee — A Multi-AI Agent Platform for Product Development. 브로슈어를 책처럼 넘겨보세요.">
-<link rel="preload" as="image" href="brochure/page-01.webp">
+<title>Aidee Brochure</title>
+<meta name="description" content="Aidee — A Multi-AI Agent Platform for Product Development.">
+<link rel="preload" as="image" href="brochure/en/page-01.webp">
 <style>
   :root { --bg:#020b1e; --accent:#d4e84a; --text:#e8ecf3; --muted:#8a94a8; }
   * { box-sizing:border-box; margin:0; padding:0; }
@@ -13,7 +13,7 @@
   body {
     background: radial-gradient(ellipse at 50% 40%, #0b1a3a 0%, var(--bg) 70%);
     color:var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Hiragino Sans", "Apple SD Gothic Neo", "Noto Sans JP", "Noto Sans KR", sans-serif;
     display:flex; flex-direction:column; overflow:hidden;
   }
   header {
@@ -29,7 +29,15 @@
   .back:hover { background:rgba(255,255,255,.08); }
   .dl { background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600; }
   .dl:hover { filter:brightness(1.08); }
-  .title { font-size:14px; color:var(--muted); letter-spacing:.04em; }
+  .title { position:absolute; left:50%; transform:translateX(-50%); font-size:14px; color:var(--muted); letter-spacing:.12em; pointer-events:none; }
+  .right { display:flex; align-items:center; gap:10px; }
+  .lang { display:inline-flex; padding:3px; border-radius:999px; border:1px solid rgba(255,255,255,.18); }
+  .lang button {
+    background:none; border:none; cursor:pointer; color:var(--muted); font:inherit; font-size:13px;
+    padding:5px 12px; border-radius:999px; transition:background .2s, color .2s;
+  }
+  .lang button:hover { color:var(--text); }
+  .lang button[aria-pressed="true"] { background:rgba(255,255,255,.14); color:var(--text); font-weight:600; }
 
   main { flex:1; min-height:0; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:8px 16px 28px; position:relative; }
   .stage { width:min(100%, calc((100dvh - 100px) * 1.414)); max-width:1300px; display:flex; align-items:center; justify-content:center; }
@@ -58,34 +66,43 @@
     .nav { display:none; }
     .title { display:none; }
     header { padding:10px 12px; }
+    .back, .dl { padding:7px 11px; font-size:13px; }
+    .lang button { padding:4px 9px; font-size:12px; }
+    .right { gap:6px; }
   }
 </style>
 </head>
 <body>
 <header>
-  <a class="back" href="https://aidee.imweb.me">← 홈으로</a>
-  <span class="title">AIDEE BROCHURE 2026</span>
-  <a class="dl" href="brochure/Aidee_Brochure_2026.pdf" download>PDF 다운로드</a>
+  <a class="back" href="https://aidee.imweb.me" data-i18n="home">← Home</a>
+  <span class="title" data-i18n="title">BROCHURE</span>
+  <div class="right">
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="ja" aria-pressed="false">日本語</button>
+    </div>
+    <a class="dl" id="dl" href="brochure/en/Aidee_Brochure_EN.pdf" download data-i18n="download">Download PDF</a>
+  </div>
 </header>
 
 <main>
-  <button class="nav prev" id="prev" aria-label="이전 페이지">‹</button>
+  <button class="nav prev" id="prev" aria-label="Previous page">‹</button>
   <div class="stage">
-    <span class="loading" id="loading">브로슈어 불러오는 중…</span>
+    <span class="loading" id="loading">Loading…</span>
     <div id="book">
-      <div class="page" data-density="hard"><img src="brochure/page-01.webp" alt="Aidee 브로슈어 표지 — Make Ideas Visible"></div>
-      <div class="page"><img src="brochure/page-02.webp" alt="브로슈어 2페이지" loading="lazy"></div>
-      <div class="page"><img src="brochure/page-03.webp" alt="브로슈어 3페이지" loading="lazy"></div>
-      <div class="page"><img src="brochure/page-04.webp" alt="브로슈어 4페이지" loading="lazy"></div>
-      <div class="page"><img src="brochure/page-05.webp" alt="브로슈어 5페이지" loading="lazy"></div>
-      <div class="page"><img src="brochure/page-06.webp" alt="브로슈어 6페이지" loading="lazy"></div>
-      <div class="page"><img src="brochure/page-07.webp" alt="브로슈어 7페이지" loading="lazy"></div>
-      <div class="page"><img src="brochure/page-08.webp" alt="브로슈어 8페이지" loading="lazy"></div>
-      <div class="page"><img src="brochure/page-09.webp" alt="브로슈어 9페이지" loading="lazy"></div>
-      <div class="page" data-density="hard"><img src="brochure/page-10.webp" alt="브로슈어 뒷표지" loading="lazy"></div>
+      <div class="page" data-density="hard"><img src="brochure/en/page-01.webp" alt="Aidee brochure page 1"></div>
+      <div class="page"><img src="brochure/en/page-02.webp" alt="Aidee brochure page 2" loading="lazy"></div>
+      <div class="page"><img src="brochure/en/page-03.webp" alt="Aidee brochure page 3" loading="lazy"></div>
+      <div class="page"><img src="brochure/en/page-04.webp" alt="Aidee brochure page 4" loading="lazy"></div>
+      <div class="page"><img src="brochure/en/page-05.webp" alt="Aidee brochure page 5" loading="lazy"></div>
+      <div class="page"><img src="brochure/en/page-06.webp" alt="Aidee brochure page 6" loading="lazy"></div>
+      <div class="page"><img src="brochure/en/page-07.webp" alt="Aidee brochure page 7" loading="lazy"></div>
+      <div class="page"><img src="brochure/en/page-08.webp" alt="Aidee brochure page 8" loading="lazy"></div>
+      <div class="page"><img src="brochure/en/page-09.webp" alt="Aidee brochure page 9" loading="lazy"></div>
+      <div class="page" data-density="hard"><img src="brochure/en/page-10.webp" alt="Aidee brochure page 10" loading="lazy"></div>
     </div>
   </div>
-  <button class="nav next" id="next" aria-label="다음 페이지">›</button>
+  <button class="nav next" id="next" aria-label="Next page">›</button>
 </main>
 
 <script src="brochure/page-flip.browser.js"></script>
@@ -127,6 +144,35 @@
     el.style.transform = 'translateX(' + shift + '%)';
   }
   function update() { center(book.getCurrentPageIndex()); render(); }
+
+  // ── 언어 전환 (기본 영어, ?lang=ja 로 일본어 바로 열기 가능) ──
+  var I18N = {
+    en: { home:'← Home', title:'BROCHURE', download:'Download PDF', pdf:'brochure/en/Aidee_Brochure_EN.pdf', html:'en' },
+    ja: { home:'← ホーム', title:'BROCHURE', download:'PDFダウンロード', pdf:'brochure/ja/Aidee_Brochure_JA.pdf', html:'ja' }
+  };
+  var imgs = el.querySelectorAll('.page img');
+  var langBtns = document.querySelectorAll('.lang button');
+  function setLang(lang, push) {
+    if (!I18N[lang]) lang = 'en';
+    var t = I18N[lang];
+    imgs.forEach(function (img, k) {
+      img.src = 'brochure/' + lang + '/page-' + String(k + 1).padStart(2, '0') + '.webp';
+    });
+    document.querySelectorAll('[data-i18n]').forEach(function (n) { n.textContent = t[n.getAttribute('data-i18n')]; });
+    document.getElementById('dl').href = t.pdf;
+    document.documentElement.lang = t.html;
+    langBtns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang') === lang); });
+    if (push) {
+      var u = new URL(location.href);
+      if (lang === 'en') u.searchParams.delete('lang'); else u.searchParams.set('lang', lang);
+      history.replaceState(null, '', u);
+    }
+    // 다른 언어 이미지 미리 받아두기
+    var other = lang === 'en' ? 'ja' : 'en';
+    for (var k = 1; k <= total; k++) { var p = new Image(); p.src = 'brochure/' + other + '/page-' + String(k).padStart(2, '0') + '.webp'; }
+  }
+  langBtns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang'), true); }); });
+  setLang(new URLSearchParams(location.search).get('lang') || 'en', false);
 
   book.on('flip', update);
   book.on('changeOrientation', update);
