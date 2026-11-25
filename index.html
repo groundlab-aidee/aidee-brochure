@@ -29,8 +29,56 @@
   .back:hover { background:rgba(255,255,255,.08); }
   .dl { background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600; }
   .dl:hover { filter:brightness(1.08); }
+  .back, .dl { white-space:nowrap; }
+  .dl-short { display:none; }
   .title { position:absolute; left:50%; transform:translateX(-50%); font-size:14px; color:var(--muted); letter-spacing:.12em; pointer-events:none; }
   .right { display:flex; align-items:center; gap:10px; }
+  .sound {
+    width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.18);
+    background:none; color:var(--text); cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+    transition:background .2s;
+  }
+  .sound:hover { background:rgba(255,255,255,.08); }
+  .sound svg { width:18px; height:18px; }
+  .sound .off { display:none; }
+  .sound[aria-pressed="false"] .on { display:none; }
+  .sound[aria-pressed="false"] .off { display:block; }
+
+  /* ── 확대 보기 ── */
+  .zoom-btn {
+    width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.18);
+    background:none; color:var(--text); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:background .2s;
+  }
+  .zoom-btn:hover { background:rgba(255,255,255,.08); }
+  .zoom-btn svg { width:18px; height:18px; }
+  .viewer {
+    position:fixed; inset:0; z-index:100; background:rgba(2,8,22,.97);
+    display:none; touch-action:none; user-select:none; overflow:hidden;
+  }
+  .viewer.open { display:block; }
+  .viewer img {
+    position:absolute; left:0; top:0; transform-origin:0 0; max-width:none;
+    -webkit-user-drag:none; cursor:grab; box-shadow:0 10px 40px rgba(0,0,0,.5);
+  }
+  .viewer img.dragging { cursor:grabbing; }
+  .viewer .bar {
+    position:absolute; left:50%; bottom:20px; transform:translateX(-50%);
+    display:flex; align-items:center; gap:4px; padding:6px; border-radius:999px;
+    background:rgba(20,30,55,.9); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(8px);
+  }
+  .viewer .bar button {
+    min-width:38px; height:38px; padding:0 10px; border:none; border-radius:999px; background:none;
+    color:var(--text); font:inherit; font-size:18px; cursor:pointer; transition:background .2s;
+  }
+  .viewer .bar button:hover { background:rgba(255,255,255,.12); }
+  .viewer .bar button:disabled { opacity:.3; pointer-events:none; }
+  .viewer .bar .pct { min-width:58px; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .viewer .bar .sep { width:1px; height:20px; background:rgba(255,255,255,.15); margin:0 4px; }
+  .viewer .close {
+    position:absolute; top:16px; right:16px; width:44px; height:44px; border-radius:50%;
+    border:none; background:rgba(255,255,255,.1); color:var(--text); font-size:22px; cursor:pointer;
+  }
+  .viewer .close:hover { background:var(--accent); color:var(--bg); }
   .lang { display:inline-flex; padding:3px; border-radius:999px; border:1px solid rgba(255,255,255,.18); }
   .lang button {
     background:none; border:none; cursor:pointer; color:var(--muted); font:inherit; font-size:13px;
@@ -69,6 +117,11 @@
     .back, .dl { padding:7px 11px; font-size:13px; }
     .lang button { padding:4px 9px; font-size:12px; }
     .right { gap:6px; }
+    .sound, .zoom-btn { width:32px; height:32px; }
+    .dl-full { display:none; }
+    .dl-short { display:inline; }
+    .viewer .bar { bottom:max(14px, env(safe-area-inset-bottom)); }
+    .viewer .bar button { min-width:34px; height:34px; padding:0 6px; }
   }
 </style>
 </head>
@@ -77,11 +130,18 @@
   <a class="back" href="https://aidee.imweb.me" data-i18n="home">← Home</a>
   <span class="title" data-i18n="title">BROCHURE</span>
   <div class="right">
+    <button type="button" class="zoom-btn" id="zoomBtn" aria-label="Zoom" title="Zoom">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
+    </button>
+    <button type="button" class="sound" id="sound" aria-pressed="true" aria-label="Sound on/off" title="Sound">
+      <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
+      <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m23 9-6 6"/><path d="m17 9 6 6"/></svg>
+    </button>
     <div class="lang" role="group" aria-label="Language">
       <button type="button" data-lang="en" aria-pressed="true">EN</button>
       <button type="button" data-lang="ja" aria-pressed="false">日本語</button>
     </div>
-    <a class="dl" id="dl" href="brochure/en/Aidee_Brochure_EN.pdf" download data-i18n="download">Download PDF</a>
+    <a class="dl" id="dl" href="brochure/en/Aidee_Brochure_EN.pdf" download><span class="dl-full" data-i18n="download">Download PDF</span><span class="dl-short">PDF ↓</span></a>
   </div>
 </header>
 
@@ -104,6 +164,20 @@
   </div>
   <button class="nav next" id="next" aria-label="Next page">›</button>
 </main>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Zoom">
+  <img id="zimg" alt="">
+  <button type="button" class="close" id="zclose" aria-label="Close">✕</button>
+  <div class="bar">
+    <button type="button" id="zprev" aria-label="Previous page">‹</button>
+    <span class="pct" id="zpage"></span>
+    <button type="button" id="znext" aria-label="Next page">›</button>
+    <span class="sep"></span>
+    <button type="button" id="zout" aria-label="Zoom out">−</button>
+    <button type="button" class="pct" id="zpct" aria-label="Fit to screen">100%</button>
+    <button type="button" id="zin" aria-label="Zoom in">+</button>
+  </div>
+</div>
 
 <script src="brochure/page-flip.browser.js"></script>
 <script>
@@ -151,9 +225,11 @@
     ja: { home:'← ホーム', title:'BROCHURE', download:'PDFダウンロード', pdf:'brochure/ja/Aidee_Brochure_JA.pdf', html:'ja' }
   };
   var imgs = el.querySelectorAll('.page img');
+  var curLang = 'en';
   var langBtns = document.querySelectorAll('.lang button');
   function setLang(lang, push) {
     if (!I18N[lang]) lang = 'en';
+    curLang = lang;
     var t = I18N[lang];
     imgs.forEach(function (img, k) {
       img.src = 'brochure/' + lang + '/page-' + String(k + 1).padStart(2, '0') + '.webp';
@@ -173,6 +249,176 @@
   }
   langBtns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang'), true); }); });
   setLang(new URLSearchParams(location.search).get('lang') || 'en', false);
+
+  // ── 페이지 넘김 효과음 (Web Audio로 종이 소리를 직접 합성 — 별도 음원 파일 없음) ──
+  var soundBtn = document.getElementById('sound');
+  var soundOn = true;
+  try { soundOn = localStorage.getItem('brochureSound') !== 'off'; } catch (e) {}
+  soundBtn.setAttribute('aria-pressed', soundOn);
+  soundBtn.addEventListener('click', function () {
+    soundOn = !soundOn;
+    soundBtn.setAttribute('aria-pressed', soundOn);
+    try { localStorage.setItem('brochureSound', soundOn ? 'on' : 'off'); } catch (e) {}
+    if (soundOn) playFlip();
+  });
+
+  var ctx = null, noise = null;
+  function audio() {
+    if (!ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ctx = new AC();
+      var len = Math.floor(ctx.sampleRate * 0.6);
+      noise = ctx.createBuffer(1, len, ctx.sampleRate);
+      var d = noise.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  // 브라우저는 사용자가 한 번 클릭/터치해야 소리를 허용하므로 첫 입력에서 미리 준비
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function (ev) {
+    window.addEventListener(ev, function () { if (soundOn) audio(); }, { once: true, passive: true });
+  });
+
+  function burst(c, t0, dur, f0, f1, q, gain) {
+    var src = c.createBufferSource(); src.buffer = noise;
+    var bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = q;
+    bp.frequency.setValueAtTime(f0, t0);
+    bp.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    var hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 350;
+    var g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain, t0 + dur * 0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(bp); bp.connect(hp); hp.connect(g); g.connect(c.destination);
+    src.start(t0, Math.random() * 0.2, dur + 0.05);
+  }
+  function playFlip() {
+    if (!soundOn) return;
+    var c = audio(); if (!c) return;
+    var t = c.currentTime + 0.01, r = 0.85 + Math.random() * 0.3;
+    burst(c, t, 0.42 * r, 900, 3200, 0.9, 0.22);              // 종이가 공기를 가르는 '스르륵'
+    for (var k = 0; k < 4; k++)                                // 종이 바스락거림
+      burst(c, t + 0.05 + Math.random() * 0.25, 0.035, 2500 + Math.random() * 2500, 4000, 2.5, 0.08);
+    burst(c, t + 0.36 * r, 0.09, 1600, 700, 1.2, 0.18);       // 페이지가 내려앉는 '탁'
+  }
+  book.on('changeState', function (e) { if (e.data === 'flipping') playFlip(); });
+
+
+  // ── 확대 보기: 고해상도 이미지로 한 페이지씩 크게 보기 (휠·핀치·드래그·더블클릭) ──
+  var viewer = document.getElementById('viewer'), zimg = document.getElementById('zimg');
+  var zpage = document.getElementById('zpage'), zpct = document.getElementById('zpct');
+  var zprev = document.getElementById('zprev'), znext = document.getElementById('znext');
+  var zi = 0, sc = 1, fit = 1, tx = 0, ty = 0, natW = 2400, natH = 3394;
+  var MAXZ = 4;   // 화면 맞춤 대비 최대 배율
+
+  function zsrc(k) { return 'brochure/' + curLang + '/zoom/page-' + String(k + 1).padStart(2, '0') + '.webp'; }
+  function apply() {
+    zimg.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + sc + ')';
+    zpct.textContent = Math.round(sc / fit * 100) + '%';
+  }
+  function clamp() {
+    var vw = innerWidth, vh = innerHeight, w = natW * sc, h = natH * sc;
+    tx = w <= vw ? (vw - w) / 2 : Math.min(0, Math.max(vw - w, tx));
+    ty = h <= vh ? (vh - h) / 2 : Math.min(0, Math.max(vh - h, ty));
+  }
+  function fitPage() {
+    fit = Math.min((innerWidth - 32) / natW, (innerHeight - 100) / natH);
+    sc = fit; tx = (innerWidth - natW * sc) / 2; ty = Math.max(16, (innerHeight - 84 - natH * sc) / 2);
+    apply();
+  }
+  function zoomAt(ns, cx, cy) {
+    ns = Math.max(fit, Math.min(fit * MAXZ, ns));
+    tx = cx - (cx - tx) * ns / sc; ty = cy - (cy - ty) * ns / sc; sc = ns;
+    if (sc <= fit + 1e-6) { fitPage(); return; }
+    clamp(); apply();
+  }
+  function showPage(k) {
+    zi = Math.max(0, Math.min(total - 1, k));
+    zimg.src = imgs[zi].src;              // 저해상도 먼저 바로 보여주고
+    var hi = new Image();                 // 고해상도가 받아지면 교체
+    hi.onload = function () { if (viewer.classList.contains('open') && hi.src.indexOf(zsrc(zi)) >= 0) zimg.src = hi.src; };
+    hi.src = zsrc(zi);
+    zimg.style.width = natW + 'px'; zimg.style.height = natH + 'px';
+    zpage.textContent = (zi + 1) + ' / ' + total;
+    zprev.disabled = zi === 0; znext.disabled = zi === total - 1;
+    fitPage();
+  }
+  function visiblePages() {
+    var i = book.getCurrentPageIndex();
+    if (book.getOrientation() !== 'landscape' || i === 0 || (i === total - 1 && total % 2 === 0)) return [i];
+    var left = i % 2 === 1 ? i : i - 1;
+    return [left, left + 1];
+  }
+  function openZoom(k) {
+    viewer.classList.add('open');
+    showPage(k == null ? visiblePages()[0] : k);
+  }
+  function closeZoom() {
+    viewer.classList.remove('open');
+    var vis = visiblePages();
+    if (vis.indexOf(zi) < 0) { book.turnToPage(zi); update(); }
+  }
+  document.getElementById('zoomBtn').addEventListener('click', function () { openZoom(); });
+  document.getElementById('zclose').addEventListener('click', closeZoom);
+  zprev.addEventListener('click', function () { showPage(zi - 1); });
+  znext.addEventListener('click', function () { showPage(zi + 1); });
+  document.getElementById('zin').addEventListener('click', function () { zoomAt(sc * 1.5, innerWidth / 2, innerHeight / 2); });
+  document.getElementById('zout').addEventListener('click', function () { zoomAt(sc / 1.5, innerWidth / 2, innerHeight / 2); });
+  zpct.addEventListener('click', fitPage);
+  addEventListener('resize', function () { if (viewer.classList.contains('open')) fitPage(); });
+
+  viewer.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    zoomAt(sc * Math.pow(1.0015, -e.deltaY), e.clientX, e.clientY);
+  }, { passive: false });
+
+  var pts = {}, last = null, pinch = null, lastTap = 0;
+  zimg.addEventListener('pointerdown', function (e) {
+    zimg.setPointerCapture(e.pointerId);
+    pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(pts);
+    if (ids.length === 1) {
+      last = { x: e.clientX, y: e.clientY }; zimg.classList.add('dragging');
+      var now = Date.now();
+      if (now - lastTap < 300) zoomAt(sc > fit * 1.2 ? fit : fit * 2.5, e.clientX, e.clientY);   // 더블탭: 확대/원래대로
+      lastTap = now;
+    } else if (ids.length === 2) {
+      var a = pts[ids[0]], b = pts[ids[1]];
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), s: sc };
+    }
+  });
+  zimg.addEventListener('pointermove', function (e) {
+    if (!pts[e.pointerId]) return;
+    pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(pts);
+    if (ids.length === 2 && pinch) {
+      var a = pts[ids[0]], b = pts[ids[1]];
+      zoomAt(pinch.s * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d, (a.x + b.x) / 2, (a.y + b.y) / 2);
+    } else if (ids.length === 1 && last) {
+      tx += e.clientX - last.x; ty += e.clientY - last.y;
+      last = { x: e.clientX, y: e.clientY };
+      if (sc > fit + 1e-6) { clamp(); apply(); } else { apply(); }
+    }
+  });
+  function up(e) {
+    var wasFit = sc <= fit + 1e-6, dx = last ? e.clientX - (pts[e.pointerId] || last).x : 0;
+    delete pts[e.pointerId];
+    if (Object.keys(pts).length < 2) pinch = null;
+    if (!Object.keys(pts).length) {
+      zimg.classList.remove('dragging');
+      if (wasFit) {    // 화면 맞춤 상태에서 좌우로 밀면 페이지 이동
+        var moved = tx - (innerWidth - natW * sc) / 2;
+        if (moved < -60 && zi < total - 1) return showPage(zi + 1);
+        if (moved > 60 && zi > 0) return showPage(zi - 1);
+        fitPage();
+      }
+      last = null;
+    }
+  }
+  zimg.addEventListener('pointerup', up);
+  zimg.addEventListener('pointercancel', up);
 
   book.on('flip', update);
   book.on('changeOrientation', update);
@@ -194,6 +440,14 @@
   prev.addEventListener('click', function () { go(-1); });
   next.addEventListener('click', function () { go(1); });
   document.addEventListener('keydown', function (e) {
+    if (viewer.classList.contains('open')) {
+      if (e.key === 'Escape') closeZoom();
+      if (e.key === 'ArrowLeft') showPage(zi - 1);
+      if (e.key === 'ArrowRight') showPage(zi + 1);
+      if (e.key === '+' || e.key === '=') zoomAt(sc * 1.5, innerWidth / 2, innerHeight / 2);
+      if (e.key === '-') zoomAt(sc / 1.5, innerWidth / 2, innerHeight / 2);
+      return;
+    }
     if (e.key === 'ArrowLeft') go(-1);
     if (e.key === 'ArrowRight') go(1);
   });
